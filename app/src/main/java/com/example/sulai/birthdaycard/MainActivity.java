@@ -25,8 +25,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     boolean running = false;
     SensorManager sensorManager;
     TextView tv_steps;
+    float initialStep1 = 0;
     float initialStep = 0;
     float finalStep = 0;
+    float finalStep1 = 0;
     boolean timerRunning = false;
 
 
@@ -62,31 +64,37 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
 
     private void start() {
-        timerRunning = true;
-        time.setText("15");
+        if(timerRunning == false) {
+            timerRunning = true;
+            initialStep = initialStep1;
+            time.setText("15");
 
 
-        countDownTimer = new CountDownTimer(15*1000,1000){
-            @Override
-            public void onTick(long millisUntilFinished) {
-                time.setText("" + millisUntilFinished/1000);
+            countDownTimer = new CountDownTimer(15 * 1000, 1000) {
+                @Override
+                public void onTick(long millisUntilFinished) {
+                    time.setText("" + millisUntilFinished / 1000);
 
-            }
+                }
 
-            @Override
-            public void onFinish() {
-                time.setText("Done !");
-            }
-        };
+                @Override
+                public void onFinish() {
+                    time.setText("Done !");
+                    timerRunning =false;
+                    finalStep = finalStep1;
+                    tv_steps.setText(String.valueOf(finalStep - initialStep));
+                }
+            };
 
-        countDownTimer.start();
-
+            countDownTimer.start();
+        }
     }
 
     private void cancel() {
         if(countDownTimer != null){
             countDownTimer.cancel();
             countDownTimer = null;
+            timerRunning = false;
         }
     }
 
@@ -114,9 +122,10 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     @Override
     public void onSensorChanged(SensorEvent event) {
         if (running){
-            initialStep = event.values[0];
-            tv_steps.setText(String.valueOf(initialStep));
+            initialStep1 = event.values[0];
+            finalStep1 = event.values[0];
             start();
+
         }
     }
 
